@@ -38,19 +38,13 @@ export async function POST(request: Request) {
       message: 'Minimal tests passed'
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Minimal test failed:', error);
-    console.error('Error details:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
     return NextResponse.json({
       success: false,
-      error: error.message,
-      details: error.response?.data,
-      status: error.response?.status
+      error: errorMessage
     }, { status: 500 });
   }
 }

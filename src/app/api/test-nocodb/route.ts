@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { nocodbService, nocodbApi } from '../../../../lib/nocodb';
+import { nocodbService } from '../../../../lib/nocodb';
 
 export async function GET() {
   try {
@@ -20,7 +20,7 @@ export async function GET() {
     // Test getting all tables to see structure
     console.log('Getting all tables...');
     const allTables = await nocodbService.getTables();
-    console.log('Available tables:', allTables.list?.map((t: any) => ({ id: t.id, title: t.title })) || allTables);
+    console.log('Available tables:', allTables.list?.map((t: { id: string; title: string }) => ({ id: t.id, title: t.title })) || allTables);
     
     // Test creating a simple difunto without photos
     const testDifuntoData = {
@@ -43,19 +43,13 @@ export async function GET() {
       difuntosCount: difuntos.list?.length || 0
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('NocoDB connection test failed:', error);
-    console.error('Error details:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
-    });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
     return NextResponse.json({
       success: false,
-      error: error.message,
-      details: error.response?.data,
-      status: error.response?.status
+      error: errorMessage
     }, { status: 500 });
   }
 }

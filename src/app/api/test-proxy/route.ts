@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import axios from 'axios';
 import https from 'https';
 
@@ -35,16 +35,13 @@ export async function GET() {
       size: response.data.byteLength
     });
     
-  } catch (error: any) {
-    console.error('Test error:', error.message);
-    console.error('Error status:', error.response?.status);
-    console.error('Error data:', error.response?.data);
+  } catch (error: unknown) {
+    console.error('Test error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
     return NextResponse.json({
       success: false,
-      error: error.message,
-      status: error.response?.status,
-      data: error.response?.data
+      error: errorMessage
     }, { status: 500 });
   }
 }
