@@ -7,7 +7,7 @@ const NOCODB_TOKEN = process.env.NOCODB_TOKEN || 'aJjkcJUqJDlltpOI6J7QLLnW1HaRkM
 const BASE_ID = 'py0878vkmblvxv2';
 
 // Table IDs (generated when tables were created)
-const TABLE_IDS = {
+export const TABLE_IDS = {
   clientes: 'm9k7d1uhlz5wxpc',
   difuntos: 'm3civgj4b06c2oi'
 };

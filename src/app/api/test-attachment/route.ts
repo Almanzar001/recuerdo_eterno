@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { nocodbApi, TABLE_IDS } from '../../../../lib/nocodb';
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     console.log('Testing attachment upload...');
     
@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     
     // Test form-data upload
     console.log('Testing form-data upload...');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const FormData = require('form-data');
     const formData = new FormData();
     
@@ -63,19 +64,16 @@ export async function POST(request: NextRequest) {
       message: 'Attachment test completed'
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Attachment test failed:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error details:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status
+      message: errorMessage,
     });
     
     return NextResponse.json({
       success: false,
-      error: error.message,
-      details: error.response?.data,
-      status: error.response?.status
+      error: errorMessage,
     }, { status: 500 });
   }
 }
