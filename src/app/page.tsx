@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Heart, QrCode, Users, Settings } from "lucide-react";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 export default function Home() {
   return (
@@ -131,6 +132,8 @@ export default function Home() {
           </p>
         </div>
       </footer>
+      
+      <PWAInstallPrompt />
     </div>
   );
 }
