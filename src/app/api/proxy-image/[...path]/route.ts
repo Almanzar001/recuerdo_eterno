@@ -13,7 +13,7 @@ export async function GET(
 ) {
   try {
     const imagePath = params.path.join('/');
-    const nocodbUrl = `${process.env.NOCODB_BASE_URL || 'https://ssnocodbss.coman2uniformes.com'}/${imagePath}`;
+    const nocodbUrl = `${process.env.NOCODB_BASE_URL || 'https://recuerdoeternobd.fu-app.com'}/${imagePath}`;
     
     console.log('=== PROXY IMAGE REQUEST ===');
     console.log('Raw path params:', params.path);
@@ -25,7 +25,7 @@ export async function GET(
     // Use axios with custom agent for better SSL handling
     const response = await axios.get(nocodbUrl, {
       headers: {
-        'xc-token': process.env.NOCODB_TOKEN || 'aJjkcJUqJDlltpOI6J7QLLnW1HaRkMscERQJso-N'
+        'xc-token': process.env.NOCODB_TOKEN || 'l6DUZOc_1mqYISh9jpCOB_jDvzh9tH4xUzTYcRnu'
       },
       httpsAgent: httpsAgent,
       responseType: 'arraybuffer',

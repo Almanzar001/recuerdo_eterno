@@ -76,11 +76,6 @@ export default function DifuntoPage() {
       const difuntoData = await clientApiService.getDifuntoById(params.id as string);
       const fotosData = await clientApiService.getFotosByDifunto(params.id as string);
       
-      console.log('=== DIFUNTO PAGE DEBUG ===');
-      console.log('Difunto data:', difuntoData);
-      console.log('Fotos data:', fotosData);
-      console.log('Fotos list:', fotosData.list);
-      console.log('=== END DEBUG ===');
       
       setDifunto(difuntoData);
       setFotos(fotosData.list || []);
