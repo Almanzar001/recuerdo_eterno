@@ -207,15 +207,6 @@ export default function PhotoGallery({ fotos }: PhotoGalleryProps) {
                 }}
               />
 
-              {/* Descripción de la foto */}
-              {(selectedPhoto.descripcion || selectedPhoto.Descripción) && (
-                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-4 rounded-b-lg">
-                  <p className="text-center text-sm md:text-base">
-                    {selectedPhoto.descripcion || selectedPhoto.Descripción}
-                  </p>
-                </div>
-              )}
-
               {/* Contador de fotos */}
               {fotos.length > 1 && (
                 <div className="absolute top-4 left-4 text-white bg-black bg-opacity-50 px-3 py-1 rounded-full text-sm">

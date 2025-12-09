@@ -41,7 +41,7 @@ export default function AdminPage() {
   };
 
   const handleGenerateQR = async (difunto: Difunto) => {
-    const difuntoId = (difunto.ID || difunto.id)?.toString() || '';
+    const difuntoId = (difunto.Id || difunto.ID || difunto.id)?.toString() || '';
     const difuntoNombre = difunto.Nombre || difunto.nombre || 'difunto';
     
     try {
@@ -70,9 +70,12 @@ export default function AdminPage() {
   const handleDelete = async (id: string) => {
     if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
       try {
+        console.log('Eliminando difunto con ID:', id);
         await clientApiService.deleteDifunto(id);
+        console.log('Difunto eliminado exitosamente, recargando datos...');
         alert('Registro eliminado correctamente.');
-        loadData();
+        await loadData(); // Hacer la carga asíncrona para asegurar que se complete
+        console.log('Datos recargados');
       } catch (error) {
         console.error('Error deleting record:', error);
         alert('Error al eliminar el registro. Por favor intenta de nuevo.');
@@ -97,6 +100,20 @@ export default function AdminPage() {
   const handleCloseForm = () => {
     setShowFormModal(false);
     setEditingDifunto(undefined);
+  };
+
+  // Cliente functions
+  const handleDeleteCliente = async (id: string) => {
+    if (confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
+      try {
+        await clientApiService.deleteCliente(id);
+        alert('Cliente eliminado correctamente.');
+        loadData();
+      } catch (error) {
+        console.error('Error deleting cliente:', error);
+        alert('Error al eliminar el cliente. Por favor intenta de nuevo.');
+      }
+    }
   };
 
   const handleAddCliente = () => {
@@ -192,7 +209,7 @@ export default function AdminPage() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {difuntos.map((difunto, index) => (
-                        <tr key={difunto.ID || difunto.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
+                        <tr key={difunto.Id || difunto.ID || difunto.id || `difunto-${index}`} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">
                               {difunto.Nombre || difunto.nombre}
@@ -211,7 +228,7 @@ export default function AdminPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex items-center space-x-1 flex-wrap gap-1">
                               <button 
-                                onClick={() => window.open(`/difunto/${difunto.ID || difunto.id}`, '_blank')}
+                                onClick={() => window.open(`/difunto/${difunto.Id || difunto.ID || difunto.id}`, '_blank')}
                                 className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                                 title="Ver página conmemorativa"
                               >
@@ -230,15 +247,15 @@ export default function AdminPage() {
                               
                               <button 
                                 onClick={() => handleGenerateQR(difunto)}
-                                disabled={generatingQR === (difunto.ID || difunto.id)?.toString()}
+                                disabled={generatingQR === (difunto.Id || difunto.ID || difunto.id)?.toString()}
                                 className={`inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                                  generatingQR === (difunto.ID || difunto.id)?.toString()
+                                  generatingQR === (difunto.Id || difunto.ID || difunto.id)?.toString()
                                     ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
                                 }`}
                                 title="Generar código QR personalizado con iniciales"
                               >
-                                {generatingQR === (difunto.ID || difunto.id)?.toString() ? (
+                                {generatingQR === (difunto.Id || difunto.ID || difunto.id)?.toString() ? (
                                   <>
                                     <div className="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full mr-1"></div>
                                     Generando...
@@ -252,7 +269,7 @@ export default function AdminPage() {
                               </button>
                               
                               <button 
-                                onClick={() => handleDelete((difunto.ID || difunto.id)?.toString() || '')}
+                                onClick={() => handleDelete((difunto.Id || difunto.ID || difunto.id)?.toString() || '')}
                                 className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                                 title="Eliminar registro"
                               >
@@ -302,15 +319,15 @@ export default function AdminPage() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {clientes.map((cliente, index) => (
-                        <tr key={cliente.ID || cliente.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
+                        <tr key={cliente.Id || cliente.ID || cliente.id || `cliente-${index}`} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">
-                              {cliente.Nombre || cliente.nombre}
+                              {cliente.Title || cliente.Nombre || cliente.nombre}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              {cliente.Email || cliente.email}
+                              {cliente.email || cliente.Email}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -330,6 +347,7 @@ export default function AdminPage() {
                               </button>
                               
                               <button 
+                                onClick={() => handleDeleteCliente((cliente.Id || cliente.ID || cliente.id)?.toString() || '')}
                                 className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                                 title="Eliminar cliente"
                               >

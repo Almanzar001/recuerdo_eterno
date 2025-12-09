@@ -152,7 +152,7 @@ export default function DifuntoPage() {
                       style={{
                         backgroundImage: `url(${bannerUrl})`
                       }}
-                      onClick={() => openImageModal(bannerUrl, 'Foto de Banner')}
+                      onClick={() => openImageModal(bannerUrl, '')}
                       title="Haz clic para ver la imagen completa"
                     />
                   ) : (
@@ -164,7 +164,7 @@ export default function DifuntoPage() {
                           style={{
                             backgroundImage: `url(${foto.url || foto.URL})`
                           }}
-                          onClick={() => openImageModal(foto.url || foto.URL || '', foto.descripcion || foto.Descripción || `Foto ${index + 1}`)}
+                          onClick={() => openImageModal(foto.url || foto.URL || '', '')}
                           title="Haz clic para ver la imagen completa"
                         />
                       ))}
@@ -180,11 +180,11 @@ export default function DifuntoPage() {
                 <div 
                   className="w-40 h-40 md:w-52 md:h-52 lg:w-68 lg:h-68 rounded-full border-4 border-white overflow-hidden shadow-2xl bg-cover bg-center cursor-pointer hover:scale-105 transition-transform duration-200"
                   style={{
-                    backgroundImage: `url(${getImageUrl(difunto['Foto Principal'])})`
+                    backgroundImage: `url(${getImageUrl(difunto.foto_principal || difunto['Foto Principal'])})`
                   }}
                   onClick={() => {
-                    const profileUrl = getImageUrl(difunto['Foto Principal']);
-                    openImageModal(profileUrl, `Foto de ${difunto.Nombre || difunto.nombre}`);
+                    const profileUrl = getImageUrl(difunto.foto_principal || difunto['Foto Principal']);
+                    openImageModal(profileUrl, '');
                   }}
                   title="Haz clic para ver la foto completa"
                 >
@@ -198,7 +198,7 @@ export default function DifuntoPage() {
 
             {/* Name */}
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6 relative z-10" style={{fontFamily: 'serif'}}>
-              {difunto.Nombre || difunto.nombre}
+              {difunto.nombre || difunto.Nombre}
             </h1>
 
             {/* Divider */}
@@ -206,23 +206,23 @@ export default function DifuntoPage() {
 
             {/* Dates */}
             <div className="text-lg md:text-xl text-gray-700 mb-4 font-medium relative z-10">
-              {formatDate(difunto['Fecha Nacimiento'] || difunto.fecha_nacimiento || '')} – {formatDate(difunto['Fecha Fallecimiento'] || difunto.fecha_fallecimiento || '')}
+              {formatDate(difunto.fecha_nacimiento || difunto['Fecha Nacimiento'] || '')} – {formatDate(difunto.fecha_fallecimiento || difunto['Fecha Fallecimiento'] || '')}
             </div>
 
             {/* Location */}
-            {(difunto.Ubicación || difunto.ubicacion) && (
+            {(difunto.ubicacion || difunto.Ubicación) && (
               <div className="flex items-center justify-center space-x-2 text-gray-600 mb-8 relative z-10">
                 <MapPin size={18} />
-                <span className="text-base md:text-lg">{difunto.Ubicación || difunto.ubicacion}</span>
+                <span className="text-base md:text-lg">{difunto.ubicacion || difunto.Ubicación}</span>
               </div>
             )}
 
             {/* Brief Description */}
-            {(difunto.Historia || difunto.historia) && (
+            {(difunto.historia || difunto.Historia) && (
               <div className="text-gray-600 text-base md:text-lg leading-relaxed mb-8 max-w-2xl md:max-w-4xl mx-auto relative z-10">
                 <p>
-                  {(difunto.Historia || difunto.historia)?.split('\n')[0].substring(0, 150)}
-                  {(difunto.Historia || difunto.historia)?.length > 150 ? '...' : ''}
+                  {(difunto.historia || difunto.Historia)?.split('\n')[0].substring(0, 150)}
+                  {(difunto.historia || difunto.Historia)?.length > 150 ? '...' : ''}
                 </p>
               </div>
             )}
@@ -263,11 +263,11 @@ export default function DifuntoPage() {
 
             {/* Content Section */}
             <div className="border-t border-gray-200 pt-8 relative z-10">
-              {activeSection === 'historia' && (difunto.Historia || difunto.historia) && (
+              {activeSection === 'historia' && (difunto.historia || difunto.Historia) && (
                 <div className="text-left max-w-4xl mx-auto">
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Su Historia</h3>
                   <div className="text-gray-700 leading-relaxed text-base md:text-lg space-y-4">
-                    {(difunto.Historia || difunto.historia)?.split('\n').map((paragraph, index) => (
+                    {(difunto.historia || difunto.Historia)?.split('\n').map((paragraph, index) => (
                       paragraph.trim() && (
                         <p key={index} className="mb-4">
                           {paragraph}
@@ -285,12 +285,12 @@ export default function DifuntoPage() {
                 </div>
               )}
 
-              {activeSection === 'videos' && (difunto['Video YouTube'] || difunto.video_youtube) && (
+              {activeSection === 'videos' && (difunto.video_youtube || difunto['Video YouTube']) && (
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Videos Conmemorativos</h3>
                   <div className="aspect-video rounded-lg overflow-hidden max-w-4xl mx-auto">
                     <iframe
-                      src={`https://www.youtube.com/embed/${difunto['Video YouTube'] || difunto.video_youtube}`}
+                      src={`https://www.youtube.com/embed/${difunto.video_youtube || difunto['Video YouTube']}`}
                       title="Video conmemorativo"
                       className="w-full h-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -300,7 +300,7 @@ export default function DifuntoPage() {
                 </div>
               )}
 
-              {activeSection === 'videos' && !(difunto['Video YouTube'] || difunto.video_youtube) && (
+              {activeSection === 'videos' && !(difunto.video_youtube || difunto['Video YouTube']) && (
                 <div className="text-center text-gray-500 py-12">
                   <p className="text-lg">No hay videos disponibles</p>
                 </div>
@@ -353,13 +353,6 @@ export default function DifuntoPage() {
                   target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OTk5OSI+SW1hZ2VuIG5vIGRpc3BvbmlibGU8L3RleHQ+PC9zdmc+';
                 }}
               />
-
-              {/* Título de la imagen */}
-              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-4 rounded-b-lg">
-                <p className="text-center text-sm md:text-base">
-                  {enlargedImage.title}
-                </p>
-              </div>
             </div>
 
             {/* Instrucciones */}

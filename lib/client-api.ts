@@ -56,8 +56,20 @@ export const clientApiService = {
     });
 
     if (!response.ok) {
+      console.error('API Response not OK:', response.status, response.statusText);
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `API Error: ${response.status}`);
+      console.error('Error data from server:', errorData);
+      
+      // Create detailed error message
+      const errorMessage = errorData.details || errorData.error || `API Error: ${response.status}`;
+      const fullError = new Error(errorMessage);
+      
+      // Add additional properties for debugging
+      (fullError as any).status = response.status;
+      (fullError as any).statusText = response.statusText;
+      (fullError as any).serverError = errorData;
+      
+      throw fullError;
     }
 
     return response.json();
@@ -85,6 +97,19 @@ export const clientApiService = {
     return apiCall<Cliente>('/clientes', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  },
+
+  updateCliente: async (id: string, data: Partial<Cliente>) => {
+    return apiCall<Cliente>(`/clientes/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  deleteCliente: async (id: string) => {
+    return apiCall<{ success: boolean }>(`/clientes/${id}`, {
+      method: 'DELETE',
     });
   },
 

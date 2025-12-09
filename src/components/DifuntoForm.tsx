@@ -272,9 +272,17 @@ export default function DifuntoFormModal({ isOpen, onClose, onSuccess, difunto }
       onSuccess();
       onClose();
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error);
-      alert(`❌ Error al ${isEditing ? 'actualizar' : 'crear'} el difunto. Por favor intenta de nuevo.`);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        serverError: error.serverError
+      });
+      
+      // Show more specific error message
+      const errorMessage = error.message || `Error al ${isEditing ? 'actualizar' : 'crear'} el difunto`;
+      alert(`❌ ${errorMessage}\n\nRevisa la consola del navegador para más detalles.`);
     } finally {
       setSubmitting(false);
     }
@@ -414,9 +422,9 @@ export default function DifuntoFormModal({ isOpen, onClose, onSuccess, difunto }
               disabled={loadingClientes}
             >
               <option value="">Seleccione un cliente</option>
-              {clientes.map((cliente) => (
-                <option key={cliente.ID || cliente.id} value={(cliente.ID || cliente.id)?.toString()}>
-                  {cliente.Nombre || cliente.nombre} - {cliente.Email || cliente.email}
+              {clientes.map((cliente, index) => (
+                <option key={cliente.Id || cliente.ID || cliente.id || `cliente-option-${index}`} value={(cliente.Id || cliente.ID || cliente.id)?.toString()}>
+                  {cliente.Title || cliente.Nombre || cliente.nombre} - {cliente.email || cliente.Email}
                 </option>
               ))}
             </select>

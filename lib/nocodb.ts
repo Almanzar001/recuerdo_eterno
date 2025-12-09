@@ -2,14 +2,14 @@ import axios from 'axios';
 import https from 'https';
 
 // NocoDB configuration
-const NOCODB_BASE_URL = process.env.NOCODB_BASE_URL || 'https://ssnocodbss.coman2uniformes.com';
-const NOCODB_TOKEN = process.env.NOCODB_TOKEN || 'aJjkcJUqJDlltpOI6J7QLLnW1HaRkMscERQJso-N';
-const BASE_ID = 'py0878vkmblvxv2';
+const NOCODB_BASE_URL = process.env.NOCODB_BASE_URL || 'https://recuerdoeternobd.fu-app.com';
+const NOCODB_TOKEN = process.env.NOCODB_TOKEN || 'l6DUZOc_1mqYISh9jpCOB_jDvzh9tH4xUzTYcRnu';
+const BASE_ID = 'p51vwzpi8p7kjp7';
 
 // Table IDs (generated when tables were created)
 export const TABLE_IDS = {
-  clientes: 'm9k7d1uhlz5wxpc',
-  difuntos: 'm3civgj4b06c2oi'
+  clientes: 'mr61uck206irdkn',
+  difuntos: 'mx8f9didpxdrfos'
 };
 
 // Create axios instance for NocoDB with SSL handling
@@ -102,11 +102,29 @@ export interface Comentario {
 // Helper functions for attachment upload
 const uploadPhotoAsAttachment = async (difuntoId: string, fieldName: string, photoData: string) => {
   try {
+    console.log(`Uploading ${fieldName} for difunto ${difuntoId}`);
+    console.log(`Photo data type: ${typeof photoData}, length: ${photoData?.length}`);
+    
     // Parse JSON photo data
-    const photoObj = JSON.parse(photoData);
+    let photoObj;
+    try {
+      photoObj = JSON.parse(photoData);
+    } catch (parseError) {
+      console.error(`Error parsing photo data for ${fieldName}:`, parseError);
+      throw new Error(`Invalid photo data format for ${fieldName}`);
+    }
+    
+    if (!photoObj.url || typeof photoObj.url !== 'string') {
+      throw new Error(`Invalid photo URL in ${fieldName}`);
+    }
     
     // Convert base64 back to Buffer
-    const base64Data = photoObj.url.split(',')[1];
+    const base64Parts = photoObj.url.split(',');
+    if (base64Parts.length !== 2) {
+      throw new Error(`Invalid base64 format in ${fieldName}`);
+    }
+    
+    const base64Data = base64Parts[1];
     const buffer = Buffer.from(base64Data, 'base64');
     
     // Create FormData for attachment upload (Node.js version)
@@ -136,7 +154,7 @@ const uploadPhotoAsAttachment = async (difuntoId: string, fieldName: string, pho
     const updateResponse = await nocodbApi.patch(
       `/tables/${TABLE_IDS.difuntos}/records`,
       [{
-        ID: parseInt(difuntoId),
+        Id: parseInt(difuntoId),
         [fieldName]: [uploadResponse.data[0]]  // Ensure it's an array
       }],
       {
@@ -191,7 +209,7 @@ const uploadGalleryPhotosAsAttachments = async (difuntoId: string, photos: File[
       await nocodbApi.patch(
         `/tables/${TABLE_IDS.difuntos}/records`,
         [{
-          ID: parseInt(difuntoId),
+          Id: parseInt(difuntoId),
           fotos_json: [...existingAttachments, uploadResponse.data[0]]
         }],
         {
@@ -227,9 +245,12 @@ export const nocodbService = {
     try {
       const response = await nocodbApi.get(`/tables/${TABLE_IDS.difuntos}/records`);
       // Filtrar registros marcados como eliminados
-      const filteredList = response.data.list?.filter((difunto: any) => 
-        !difunto.Nombre?.startsWith('[ELIMINADO]')
-      ) || [];
+      const filteredList = response.data.list?.filter((difunto: any) => {
+        const isDeleted = (difunto.nombre && difunto.nombre.startsWith('[ELIMINADO]')) ||
+                         (difunto.Nombre && difunto.Nombre.startsWith('[ELIMINADO]')) ||
+                         (difunto.historia === '[REGISTRO ELIMINADO]');
+        return !isDeleted;
+      }) || [];
       
       return { ...response.data, list: filteredList };
     } catch (error) {
@@ -244,7 +265,10 @@ export const nocodbService = {
       const difunto = response.data;
       
       // Si el registro está marcado como eliminado, retornar null
-      if (difunto.Nombre?.startsWith('[ELIMINADO]')) {
+      const isDeleted = (difunto.nombre && difunto.nombre.startsWith('[ELIMINADO]')) ||
+                       (difunto.Nombre && difunto.Nombre.startsWith('[ELIMINADO]')) ||
+                       (difunto.historia === '[REGISTRO ELIMINADO]');
+      if (isDeleted) {
         return null;
       }
       
@@ -283,7 +307,14 @@ export const nocodbService = {
       );
       
       const createdDifunto = response.data;
-      const difuntoId = createdDifunto.ID || createdDifunto.id;
+      const difuntoId = createdDifunto.Id || createdDifunto.ID || createdDifunto.id;
+      
+      console.log('Created difunto response:', createdDifunto);
+      console.log('Extracted difunto ID:', difuntoId);
+      
+      if (!difuntoId) {
+        throw new Error('No se pudo obtener el ID del difunto creado');
+      }
 
       // Now upload photos as attachments if any
       if (data['Foto Principal']) {
@@ -343,9 +374,9 @@ export const nocodbService = {
       // 2. Implementar eliminación suave usando bulk PATCH
       const response = await nocodbApi.patch(`/tables/${TABLE_IDS.difuntos}/records`, [
         {
-          ID: parseInt(id),
-          Nombre: '[ELIMINADO] - ' + (new Date().toISOString().split('T')[0]),
-          Historia: '[REGISTRO ELIMINADO]'
+          Id: parseInt(id),
+          nombre: '[ELIMINADO] - ' + (new Date().toISOString().split('T')[0]),
+          historia: '[REGISTRO ELIMINADO]'
         }
       ]);
       
@@ -363,9 +394,9 @@ export const nocodbService = {
       
       const response = await nocodbApi.patch(`/tables/${TABLE_IDS.difuntos}/records`, [
         {
-          ID: parseInt(id),
-          Nombre: originalData?.Nombre || 'Registro Restaurado',
-          Historia: originalData?.Historia || 'Registro restaurado desde eliminación suave'
+          Id: parseInt(id),
+          nombre: originalData?.nombre || 'Registro Restaurado',
+          historia: originalData?.historia || 'Registro restaurado desde eliminación suave'
         }
       ]);
       
@@ -402,6 +433,36 @@ export const nocodbService = {
     } catch (error) {
       console.error('Error creating cliente:', error);
       throw error;
+    }
+  },
+
+  updateCliente: async (id: string, data: Partial<Cliente>) => {
+    try {
+      const dbData = {
+        Id: parseInt(id),
+        nombre: data.Nombre || data.nombre,
+        email: data.Email || data.email,
+        telefono: data['Teléfono'] || data.telefono
+      };
+
+      const response = await nocodbApi.patch(`/tables/${TABLE_IDS.clientes}/records`, [dbData]);
+      return response.data[0];
+    } catch (error) {
+      console.error('Error updating cliente:', error);
+      throw error;
+    }
+  },
+
+  deleteCliente: async (id: string) => {
+    try {
+      const response = await nocodbApi.delete(`/tables/${TABLE_IDS.clientes}/records`, {
+        data: [{ Id: parseInt(id) }]
+      });
+      return { success: true, deleted: id };
+    } catch (error: any) {
+      console.error('Error deleting cliente:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Error desconocido';
+      throw new Error(`No se pudo eliminar el cliente: ${errorMessage}`);
     }
   },
 

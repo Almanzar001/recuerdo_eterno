@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       fotobanner: difuntoData.fotobanner,
       video_youtube: difuntoData['Video YouTube'],
       ubicacion: difuntoData['Ubicación'],
-      Clientes: difuntoData['Cliente ID'] ? parseInt(difuntoData['Cliente ID']) : undefined
+      Cliente: difuntoData['Cliente ID'] ? [parseInt(difuntoData['Cliente ID'])] : undefined
     };
     
     console.log('Mapped data for NocoDB:', {
