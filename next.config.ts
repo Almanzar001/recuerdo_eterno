@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Docker
+  output: 'standalone',
+  
   eslint: {
     ignoreDuringBuilds: true,
   },

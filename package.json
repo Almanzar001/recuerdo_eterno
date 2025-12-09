@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "build:prod": "npm run lint && next build",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "build:docker": "docker build -t recuerdo-eterno .",
+    "start:docker": "docker run -p 3000:3000 recuerdo-eterno"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
