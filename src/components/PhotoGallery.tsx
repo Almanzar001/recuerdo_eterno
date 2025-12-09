@@ -12,6 +12,9 @@ export default function PhotoGallery({ fotos }: PhotoGalleryProps) {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number>(0);
   const [flippedCards, setFlippedCards] = useState<Set<number>>(new Set());
 
+  // Debug logging
+  console.log('PhotoGallery received fotos:', fotos?.length || 0, fotos);
+
   // Manejar teclas del teclado para navegación
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
