@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://recuerdo-eterno.vercel.app';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://recuerdoeterno.fu-app.com';
     const url = `${baseUrl}/difunto/${difuntoId}`;
     
     // Generate QR code with high error correction to allow for custom overlay
